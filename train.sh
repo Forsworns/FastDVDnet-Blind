@@ -1,0 +1,1 @@
+python train_fastdvdnet.py --device_id 4 --p 384 --lr 2e-4 --batch_size 4 --m 25600 --trainset_dir ../fastdvdnet/data/train_damage --gt_trainset_dir ../fastdvdnet/data/train_ref --valset_dir ./data/val_damage --gt_valset_dir ./data/val_ref --log_dir ./results

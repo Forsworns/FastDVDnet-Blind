@@ -1,31 +1,100 @@
-# 首届 "马栏山"杯国际音视频算法大赛 画质赛道参赛帮助
+# FastDVDnet-Blind
 
-## 赛题说明
+- Modify the [FastDVDnet](https://github.com/m-tassano/fastdvdnet) to a blind denoiser. 
 
-视频/图像损伤修复是一个比较综合的范畴，包括去伪影/去块/去噪(artifacts reduction, deblocking, denoising)。为帮助选手对赛题快速理解，这里借用了Artifacts Reduction Convolutional Neural Network供选手参考。
+- Provide the scripts to transform mp4/sequences easily.
 
-# Artifacts Reduction Convolutional Neural Network
+- Provide a trained blind denoiser. 
 
-This is a Tensorflow implementation of [Artifacts Reduction Convolutional Neural Network](https://arxiv.org/abs/1504.06993).
+- Update the DALI api to 0.22 version from 0.10 version.
 
-## Data Processing
+## FastDVDnet
 
-* Download [BSDS500](http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/BSR/BSR_bsds500.tgz) dataset, rename the dataset folder as `BSDS500` and put it in `./data` directory
+A state-of-the-art, simple and fast network for Deep Video Denoising which uses no motion compensation. FastDVDnet is orders of magnitude faster than other state-of-the-art methods.
 
-* Download [LIVE1](http://live.ece.utexas.edu/research/quality/release2/databaserelease2.zip) dataset, rename the dataset folder as `databaserelease2` and put it in `./data` directory
+## [Architecture](https://github.com/m-tassano/fastdvdnet)
 
-* change matlab working directory to `the/repository/path/data/code/source`
+## Code User Guide
 
-* run `extract_data` on matlab console
+### Dependencies
 
-## Training
+The code runs on Python +3.6. You can create a conda environment with all the dependecies by running (Thanks to Antoine Monod for the .yml file)
+```
+conda env create -f requirements.yml -n <env_name>
+```
 
-* `cd src`
+Note: this project needs the [NVIDIA DALI](https://github.com/NVIDIA/DALI) package for training. The tested version of DALI is 0.22. If you prefer to install it yourself (supposing you have CUDA 10.0), you need to run
+```
+pip install --extra-index-url https://developer.download.nvidia.com/compute/redist/cuda/10.0 nvidia-dali
+```
 
-* `python train.py`
+### Directory Tree
 
-## Testing
+```
+# in the 'data' directory
+.
+├── test_A
+│   ├── test_0800_damage # place sequence frames of the video
+ ...
+│   └── test_0849_damage
+├── test_B
+│   ├── test_0850_damage
+ ...
+│   └── test_0999_damage
+├── train_damage # place mp4 videos
+├── train_ref
+├── val_damage
+│   ├── val_0700_damage # place sequence frames of the video
+ ...
+│   └── val_0749_damage
+└── val_ref
+     ├── val_0700_ref # place sequence frames of the video
+      ...
+     └── val_0749_ref
+```
 
-* `cd src`
+### Testing
 
-* `python test.py`
+If you want to denoise an image sequence using the pretrained model you can execute
+
+```
+test_fastdvdnet.py \
+	--test_path <path_to_input_sequence> \
+	--save_path results
+```
+or use the script `test.sh`
+
+**NOTES**
+* The image sequence should be stored under <path_to_input_sequence>
+* The model has been trained on with various degradations ().
+* run with *--no_gpu* to run on CPU instead of GPU
+* set *max_num_fr_per_seq* to set the max number of frames to load per sequence
+* run with *--help* to see details on all input parameters
+
+### Training
+
+If you want to train your own models you can execute
+
+```
+train_fastdvdnet.py \
+	--trainset_dir <path_to_input_mp4s> \
+	--valset_dir <path_to_val_sequences> \
+	--log_dir logs
+```
+
+**NOTES**
+* As the dataloader in based on the DALI library, the training sequences must be provided as mp4 files, all under <path_to_input_mp4s>
+* During the training, we comment the data augmentation part due to magnitude enough training set.
+* The validation sequences must be stored as image sequences in individual folders under <path_to_val_sequences>
+* run with *--help* to see details on all input parameters
+
+
+## ABOUT
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved. This file is offered as-is,
+without any warranty.
+
+* Licence   : GPL v3+, see GPLv3.txt
+
